@@ -1,0 +1,16 @@
+
+
+* wenn ein onset ganz ans ende der seq verschoben wird,
+kann man das event nicht mit dem end-marker mergen
+
+* 2008-05-19 
+Dear Kilian,
+
+another bug that I want to indicate to you:
+
+in the chain pitches-durs2simple -> simple2score the group of 7 (septolets) doesn't work.
+
+Many thanks for your work,
+
+Luca Antignani
+
