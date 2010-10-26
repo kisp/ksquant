@@ -2,7 +2,7 @@
 
 (in-suite :ksquant-test)
 
-(test simple2voice-basic.1
+(deftest simple2voice-basic.1
   (is (equal '(((1 ((1 :NOTES (60))))
 		(1 ((1 :NOTES (60))))
 		(1 ((1 :NOTES (60))))
@@ -31,7 +31,7 @@
 			   :MERGE-MARKER
 			   :BARTOK-PIZZICATO))))
 
-(test simple2voice-basic.2
+(deftest simple2voice-basic.2
   (is (equal '(((1 ((1 :NOTES (60))))
 		(1 ((1 :NOTES (60))))
 		(1 ((1 :NOTES (60))))
@@ -68,7 +68,7 @@
 			   :MERGE-MARKER
 			   :BARTOK-PIZZICATO))))
 
-(test simple2voice-basic.3
+(deftest simple2voice-basic.3
   (is (equal '(((1
 		 ((1 :NOTES (66))
 		  (1 :NOTES (66))
@@ -112,7 +112,7 @@
 			   :MERGE-MARKER
 			   :BARTOK-PIZZICATO))))
 
-(test simple2voice-basic.4
+(deftest simple2voice-basic.4
   (is (equal '(((1
 		 ((1 :NOTES (66))
 		  (1 :NOTES (66))
@@ -157,7 +157,7 @@
 			   :MERGE-MARKER
 			   :BARTOK-PIZZICATO))))
 
-(test simple2voice-basic.5
+(deftest simple2voice-basic.5
   (is (equal '(((1
 		 ((1 :NOTES (70 67))
 		  (1 :NOTES (70 65))
@@ -205,7 +205,7 @@
 			   :MERGE-MARKER
 			   :BARTOK-PIZZICATO))))
 
-(test simple2voice-basic.6
+(deftest simple2voice-basic.6
   (is (equal '(((2 ((1 :NOTES (60))))
 		(1 ((1 :NOTES (60))))
 		:TIME-SIGNATURE
@@ -244,7 +244,7 @@
 			   :MERGE-MARKER
 			   :BARTOK-PIZZICATO))))
 
-(test simple2voice-basic.7
+(deftest simple2voice-basic.7
   (is (equal '(((2 ((1 :NOTES (60))))
 		(1 ((1.0 :NOTES (60))))
 		:TIME-SIGNATURE
@@ -313,7 +313,7 @@
 			   :MERGE-MARKER
 			   :BARTOK-PIZZICATO))))
 
-(test simple2voice-basic.8
+(deftest simple2voice-basic.8
   (is (equal '(((2 ((1 :NOTES (60))))
 		(1 ((1.0 :NOTES (60))))
 		:TIME-SIGNATURE

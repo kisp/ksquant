@@ -3,10 +3,9 @@
 (defsystem #:ksquant-test
   :components
   ((:module :test
-            :serial t
+	    :serial t
 	    :components
 	    ((:file "suite")
 	     (:file "main")
 	     (:file "simple2voice-basic"))))
-  :depends-on (:ksquant :fiveam))
-
+  :depends-on (:ksquant :myam))
