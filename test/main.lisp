@@ -217,4 +217,12 @@
 			    :elements #'(lambda () (random-float 0.1 6.0)))))
     (finishes (pw::gquantify durs))))
 
+(deftest simple-transpose
+  "Bug reported by Hans Tutschku"
+  (is (equal '((0 :NOTES (64)) 1) (simple-transpose '(0 1) 4)))
+  (is (equal '((0 :NOTES (59)) 1) (simple-transpose '((0 :notes (55)) 1) 4)))
+  (is (equal '((0 :NOTES (54 59)) 1) (simple-transpose '((0 :notes (50 55)) 1) 4)))
+  (is (equal '((0 :NOTES (62)) 1) (simple-transpose '((0 :notes ((61 :enharmonic :sharp))) 1) 1)))
+  (is (equal '((0 :NOTES ((62 :vel 60))) 1) (simple-transpose '((0 :notes ((61 :vel 60))) 1) 1))))
+
 ;; *debug-on-error*
