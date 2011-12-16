@@ -66,6 +66,10 @@
 	  (when instr
 	    (push :instrument vres)
 	    (push instr vres)))
+        (let ((staff (ccl::staff p)))
+	  (when staff
+	    (push :staff vres)
+	    (push (system::symbol-to-keyword (type-of staff)) vres)))
         ;; everything is pushed on the part lets reverse it
 	(push (nreverse vres) pres)))
     (nreverse pres)))
