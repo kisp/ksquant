@@ -30,34 +30,55 @@
 
 (in-package :ksquant)
 
+(defparameter *ksquant-ignorable-rest-duration* 0.0)
+
 (defun score2simple* (score)
   (let (pres)
     (ccl::do-parts (p score)
       (let (vres)
         (ccl::do-voices (v p)
-          (let ((events (iter
-                          (with chords = (ccl::collect-enp-objects v :chord :no-rest-p nil :no-tied-p nil))
-                          (for chord-tail on chords)
-                          (for chord = (car chord-tail))
-                          (for pchord previous chord)
-                          ;; (when (and pchord (< (+ (system::start-time pchord) (system::duration pchord))
-                          ;;                     (system::start-time chord)))
-                          ;;  (collect (* -1 (+ (system::start-time pchord) (system::duration pchord)))))
-                          (cond
-			    ((system::rest-p chord)
-			     (when (or (not pchord) (not (system::rest-p pchord)))
-			       (collect (if (zerop (system::start-time chord))
-					    '(0 :rest t)
-					    (* -1 (system::start-time chord))))))
-			    ((ccl::tied-p chord)
-			     )		; noop
-			    (t
-			     (for chord-enp = (system::enp-score-notation chord :exclude '(:start-time)))
-			     (setf (first chord-enp) (system::start-time chord))
-			     (collect chord-enp)))
-                          (when (null (cdr chord-tail))
-                            (let ((last (car (last chords))))
-                              (collect (+ (system::start-time last) (system::duration last))))))))
+          (let ((events (if (ccl::non-mensural-p v)
+                            ;; for non-mensural we need to insert the 'holes' between chords as rests
+                            (iter
+                              (with chords = (ccl::collect-enp-objects v :chord :no-rest-p nil :no-tied-p nil))
+                              (for chord-tail on chords)
+                              (for chord = (car chord-tail))
+                              (for pchord previous chord)  
+                              (cond ((null pchord)
+                                     (collect (if (zerop (system::start-time chord))
+                                                  '(0 :rest t)
+                                                (* -1 (system::start-time chord)))))
+                                    ((and pchord 
+                                          (< (system::real-end-time pchord)
+                                             (- (system::start-time chord) *ksquant-ignorable-rest-duration*)))
+                                     (collect (* -1 (system::real-end-time pchord)))))
+                              ;; allways collect the chord because we don't have rests or tied chords
+                              (for chord-enp = (system::enp-score-notation chord :exclude '(:start-time)))
+                              (setf (first chord-enp) (system::start-time chord))
+                              (collect chord-enp)
+                              (when (null (cdr chord-tail))
+                                (let ((last (car (last chords))))
+                                  (collect (+ (system::start-time last) (system::duration last))))))
+                          (iter
+                            (with chords = (ccl::collect-enp-objects v :chord :no-rest-p nil :no-tied-p nil))
+                            (for chord-tail on chords)
+                            (for chord = (car chord-tail))
+                            (for pchord previous chord)
+                            (cond
+                             ((system::rest-p chord)
+                              (when (or (not pchord) (not (system::rest-p pchord)))
+                                (collect (if (zerop (system::start-time chord))
+                                             '(0 :rest t)
+                                           (* -1 (system::start-time chord))))))
+                             ((ccl::tied-p chord)
+                              )		; noop
+                             (t
+                              (for chord-enp = (system::enp-score-notation chord :exclude '(:start-time)))
+                              (setf (first chord-enp) (system::start-time chord))
+                              (collect chord-enp)))
+                            (when (null (cdr chord-tail))
+                              (let ((last (car (last chords))))
+                                (collect (+ (system::start-time last) (system::duration last)))))))))
             ;; we need this for non-mensural
             (unless (zerop (event-start (first events)))
               (push '(0 :rest t) events))
@@ -73,4 +94,3 @@
         ;; everything is pushed on the part lets reverse it
 	(push (nreverse vres) pres)))
     (nreverse pres)))
-
