@@ -31,7 +31,7 @@
 (in-package :asdf)
 
 (defsystem #:ksquant
-  :version "0.1.4"
+  :version "0.1.5"
   :serial t
   :components
   ((:static-file "ksquant.asd")
