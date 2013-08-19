@@ -47,21 +47,22 @@
 			  (forbidden-patts nil)
 			  (merge-marker :bartok-pizzicato))
   :non-generic t
-  (ccl::make-score
-   (iter
-     (for part in (simple-change-type* :score simple))
-     (for (values voices options) = (extract-options part))
-     (collect (nconc
-	       (iter (for v in voices)
-		     (collect (simple2voice v
-					    :time-signatures time-signatures
-					    :metronomes metronomes
-					    :scale scale
-					    :max-div max-div
-					    :forbidden-divs forbidden-divs
-					    :forbidden-patts forbidden-patts
-					    :merge-marker merge-marker)))
-	       options)))))
+  (ccl::adjoin-ties
+   (ccl::make-score
+    (iter
+      (for part in (simple-change-type* :score simple))
+      (for (values voices options) = (extract-options part))
+      (collect (nconc
+                (iter (for v in voices)
+                  (collect (simple2voice v
+                                         :time-signatures time-signatures
+                                         :metronomes metronomes
+                                         :scale scale
+                                         :max-div max-div
+                                         :forbidden-divs forbidden-divs
+                                         :forbidden-patts forbidden-patts
+                                         :merge-marker merge-marker)))
+                options))))))
 
 (define-box simple2nm-score ((simple (0 1 2 3)))
   :non-generic t
