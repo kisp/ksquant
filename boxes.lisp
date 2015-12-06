@@ -38,30 +38,33 @@
   (ksquant::score2simple* score))
 
 (define-box simple2score ((simple (0 1 2 3))
-			  &key
-			  (time-signatures (4 4))
-			  (metronomes (4 60))
-			  (scale 1/4)
-			  (max-div 8)
-			  (forbidden-divs (7))
-			  (forbidden-patts nil)
-			  (merge-marker :bartok-pizzicato))
+                          &key
+                          (time-signatures (4 4))
+                          (metronomes (4 60))
+                          (scale 1/4)
+                          (max-div 8)
+                          (forbidden-divs (7))
+                          (forbidden-patts nil)
+                          (merge-marker :bartok-pizzicato))
   :non-generic t
-  (ccl::make-score
-   (iter
-     (for part in (simple-change-type* :score simple))
-     (for (values voices options) = (extract-options part))
-     (collect (nconc
-	       (iter (for v in voices)
-		     (collect (simple2voice v
-					    :time-signatures time-signatures
-					    :metronomes metronomes
-					    :scale scale
-					    :max-div max-div
-					    :forbidden-divs forbidden-divs
-					    :forbidden-patts forbidden-patts
-					    :merge-marker merge-marker)))
-	       options)))))
+  :outputs 2
+  (let ((enp
+          (iter
+           (for part in (simple-change-type* :score simple))
+           (for (values voices options) = (extract-options part))
+           (collect (nconc
+                     (iter (for v in voices)
+                           (collect (simple2voice v
+                                                  :time-signatures time-signatures
+                                                  :metronomes metronomes
+                                                  :scale scale
+                                                  :max-div max-div
+                                                  :forbidden-divs forbidden-divs
+                                                  :forbidden-patts forbidden-patts
+                                                  :merge-marker merge-marker)))
+                     options)))))
+    (values #-sbcl(ccl::make-score enp) #+sbcl nil
+            enp)))
 
 (define-box simple2nm-score ((simple (0 1 2 3)))
   :non-generic t
@@ -82,7 +85,7 @@
   (ksquant::simple-type* simple))
 
 (define-box simple-change-type ((type :score)
-				(simple (0 1 2 3)))
+                                (simple (0 1 2 3)))
   :menu (type :score :part :voice)
   (ksquant::simple-change-type* type simple))
 
@@ -110,7 +113,7 @@ note found there. Comparison is done modulo 12."
   (ksquant::simple-enharmonic* simple model-score))
 
 (define-box simple-merge ((simple1 (0 1 2 3)) (simple2 (0 0.5 2.5 3))
-			  &key (strict-durations nil))
+                          &key (strict-durations nil))
   ""
   (ksquant::simple-merge* simple1 simple2 strict-durations))
 

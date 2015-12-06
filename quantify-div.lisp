@@ -37,8 +37,8 @@
 
 (defun closest-unit (ratio unit)
   (* (round (/ (* (/ (denominator unit) (denominator ratio))
-		  (numerator ratio))
-	       (numerator unit)))
+                  (numerator ratio))
+               (numerator unit)))
      unit))
 
 (defun evaluate-div (notated-dur-points unit)
@@ -49,30 +49,30 @@
     (sum diff into error)
     (collect closest-unit into new-points)
     (finally (return
-	       (if (member (x->dx new-points) *quant-forbidden-patts* :test #'equal)
-		   +quant-forbidden-error+
-		   error)))))
+               (if (member (x->dx new-points) *quant-forbidden-patts* :test #'equal)
+                   +quant-forbidden-error+
+                   error)))))
 
 (defun quantify-durs (div-notated-dur notated-durs)
   ;; (assert (= (apply #'+ notated-durs) div-notated-dur) nil
-  ;; 	  "The sum of notated-durs should be = to div-notated-dur.
+  ;;      "The sum of notated-durs should be = to div-notated-dur.
   ;; TODO Maybe this assertion is not correct, I wanted to find out,
   ;; this is a case that speaks against it.")
   (let* ((notated-dur-points (dx->x 0 notated-durs))
-	 (quant-div
-	  (iter
-	    ;; this loop cycles through all possible
-	    ;; divisions and evaluates the associated
-	    ;; error, the division with the minimum
-	    ;; error is returned
-	    (for d from 2 to *quant-max-div*)
-	    (when (member d *quant-forbidden-divs*)
-	      (next-iteration))
-	    (for unit = (/ div-notated-dur d))
-	    (for error = (evaluate-div notated-dur-points unit))
-	    (finding d minimizing error)))
-	 (tuplet-ratio
-	  (div2tuplet-ratio div-notated-dur quant-div 'down quant-div))) ; TODO prop arg!! - was 'msym:down
+         (quant-div
+          (iter
+            ;; this loop cycles through all possible
+            ;; divisions and evaluates the associated
+            ;; error, the division with the minimum
+            ;; error is returned
+            (for d from 2 to *quant-max-div*)
+            (when (member d *quant-forbidden-divs*)
+              (next-iteration))
+            (for unit = (/ div-notated-dur d))
+            (for error = (evaluate-div notated-dur-points unit))
+            (finding d minimizing error)))
+         (tuplet-ratio
+          (div2tuplet-ratio div-notated-dur quant-div 'down quant-div))) ; TODO prop arg!! - was 'msym:down
     (iter
       (with unit = (/ div-notated-dur quant-div))
       (with fact = (mr2r tuplet-ratio))
@@ -105,13 +105,13 @@
     (for i upfrom 0)
     (for d in durs)
     (if (zerop d)
-	(push i merge-stack)
-	(if merge-stack
-	    (progn
-	      (push i merge-stack)
-	      (collect (nreverse merge-stack) into merge-list)
-	      (setq merge-stack nil))
-	    (collect i into merge-list)))
+        (push i merge-stack)
+        (if merge-stack
+            (progn
+              (push i merge-stack)
+              (collect (nreverse merge-stack) into merge-list)
+              (setq merge-stack nil))
+            (collect i into merge-list)))
     (finally (return (values merge-list (nreverse merge-stack))))))
 
 
@@ -147,24 +147,24 @@
 The following example shows the quantification of a 9-tuplet:
 @lisp
 \(quantify-div 1/4
-	      '(1/9 1/9 1/9 1/9 1/9 1/9 1/9 1/9 1/9)
-	      '(1/36 1/36 1/36 1/36 1/36 1/36 1/36 1/36 1/36))
+              '(1/9 1/9 1/9 1/9 1/9 1/9 1/9 1/9 1/9)
+              '(1/36 1/36 1/36 1/36 1/36 1/36 1/36 1/36 1/36))
 @end lisp"
   (multiple-value-bind (quant-notated-durs tuplet-ratio)
       (quantify-durs div-notated-dur children-notated-durs)
     (let ((quant-durs (change-proportionally children-notated-durs quant-notated-durs children-durs)))
       (multiple-value-bind (merge-list next-div)
-	  (calc-merge-list quant-notated-durs)
-	(setq quant-durs (delete 0 quant-durs))
-	(setq quant-notated-durs (delete 0 quant-notated-durs))
-	(values tuplet-ratio quant-durs quant-notated-durs merge-list next-div)))))
+          (calc-merge-list quant-notated-durs)
+        (setq quant-durs (delete 0 quant-durs))
+        (setq quant-notated-durs (delete 0 quant-notated-durs))
+        (values tuplet-ratio quant-durs quant-notated-durs merge-list next-div)))))
 
 
 (export 'quantify-set-prefs)
 (defun quantify-set-prefs (&key
-			   (max-div nil max-div-supplied)
-			   (forbidden-divs nil forbidden-divs-supplied)
-			   (forbidden-patts nil forbidden-patts-supplied))
+                           (max-div nil max-div-supplied)
+                           (forbidden-divs nil forbidden-divs-supplied)
+                           (forbidden-patts nil forbidden-patts-supplied))
   "Change those quantify-settings that are supplied
 in key args."
   (when max-div-supplied
@@ -188,8 +188,8 @@ in key args."
   (setq *quant-max-div* 8)
   (setq *quant-forbidden-divs* '(7))
   (setq *quant-forbidden-patts* '((1/16 3/32 3/32) (3/32 1/16 3/32) (5/32 3/32) (3/32 5/32)
-				  (1/16 5/32 1/32)
-				  (1/32 5/32 2/32)))
+                                  (1/16 5/32 1/32)
+                                  (1/32 5/32 2/32)))
   t)
 
 ;; set them now!!
@@ -201,7 +201,7 @@ in key args."
   (destructuring-bind (point &optional start) point-list
     (let ((new-point (* (round point unit) unit)))
       (when (and start (= new-point (* (round start unit) unit)))
-	(incf new-point unit))
+        (incf new-point unit))
       new-point)))
 
 (defun evaluate-div2 (points unit div-start div-notated-dur)
@@ -223,12 +223,12 @@ thus resulting in a dur of 0."
       (sum diff into error)
       (collect closest-unit into new-points)
       (finally (return
-		 ;; we can destroy new-points here
-		 (if (member (m/ (x->dx (sort (delete-duplicates (cons (+ div-start div-notated-dur)
-								       new-points)) #'<)) 4)
-			     *quant-forbidden-patts* :test #'equal)
-		     +quant-forbidden-error+
-		     error))))))
+                 ;; we can destroy new-points here
+                 (if (member (m/ (x->dx (sort (delete-duplicates (cons (+ div-start div-notated-dur)
+                                                                       new-points)) #'<)) 4)
+                             *quant-forbidden-patts* :test #'equal)
+                     +quant-forbidden-error+
+                     error))))))
 
 (export 'quantify2)
 (defun quantify2 (points div-start div-notated-dur)
@@ -250,20 +250,20 @@ The same preferences as for QUANTIFY-DIV are used.
 @end lisp"
   (when points
     (let ((quant-div
-	   (iter
-	     ;; this loop cycles through all possible
-	     ;; divisions and evaluates the associated
-	     ;; error, the division with the minimum
-	     ;; error is returned
-	     (for d from 2 to *quant-max-div*)
-	     (when (member d *quant-forbidden-divs*)
-	       (next-iteration))
-	     (for unit = (/ div-notated-dur d))
-	     (for error = (evaluate-div2 points unit div-start div-notated-dur))
-	     ;; TODO if error is equal, we should prefer
-	     ;; the smaller division
-	     (finding d minimizing error))))
+           (iter
+             ;; this loop cycles through all possible
+             ;; divisions and evaluates the associated
+             ;; error, the division with the minimum
+             ;; error is returned
+             (for d from 2 to *quant-max-div*)
+             (when (member d *quant-forbidden-divs*)
+               (next-iteration))
+             (for unit = (/ div-notated-dur d))
+             (for error = (evaluate-div2 points unit div-start div-notated-dur))
+             ;; TODO if error is equal, we should prefer
+             ;; the smaller division
+             (finding d minimizing error))))
       (iter
-	(with unit = (/ div-notated-dur quant-div))
-	(for point in points)
-	(collect (closest-unit2 (list! point) unit))))))
+        (with unit = (/ div-notated-dur quant-div))
+        (for point in points)
+        (collect (closest-unit2 (list! point) unit))))))

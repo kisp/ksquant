@@ -33,3 +33,14 @@
 (defpackage :ksquant
   (:use :cl :iterate :ompw))
 
+#+sbcl
+(defpackage :ccl
+  (:use :cl))
+
+#+sbcl
+(defpackage :pw
+  (:use :cl))
+
+#+sbcl
+(defpackage :system
+  (:use :cl))

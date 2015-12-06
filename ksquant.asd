@@ -42,4 +42,3 @@
    (:file "score2simple")
    (:file "boxes"))
   :depends-on (:iterate :ompw))
-

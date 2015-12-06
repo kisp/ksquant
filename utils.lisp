@@ -102,8 +102,8 @@ the more debug output.")
   "Keep on returning the last element."
   #'(lambda ()
       (if (null (cdr list))
-	  (car list)
-	  (pop list))))
+          (car list)
+          (pop list))))
 
 (defun make-list-generator (list)
   "Simply return nil if list is finished."
@@ -131,10 +131,10 @@ the more debug output.")
 
 (defun event-rest-p (event)
   (or (minusp (if (atom event)
-		  event
-		  (car event)))
+                  event
+                  (car event)))
       (and (consp event)
-	   (getf (cdr event) :rest))))
+           (getf (cdr event) :rest))))
 
 ;; originally written for simple2score
 (defun merge-events (event list merge-marker)
@@ -148,26 +148,26 @@ This function does not support an atom number representing an event."
        event)
       (t
        (iter
-	 (for field in '(:notes :expressions))
-	 (setf (getf (cdr event) field)
-	       (delete-duplicates
-		(nconc
-		 (getf (cdr event) field)
-		 (iter
-		   (for l in list)
-		   (nconcing (getf (cdr l) field))))
-		:test #'equal)))
+         (for field in '(:notes :expressions))
+         (setf (getf (cdr event) field)
+               (delete-duplicates
+                (nconc
+                 (getf (cdr event) field)
+                 (iter
+                   (for l in list)
+                   (nconcing (getf (cdr l) field))))
+                :test #'equal)))
        (setf (getf (cdr event) :notes)
-	     (sort (getf (cdr event) :notes) #'< :key #'(lambda (l) (if (atom l) l (first l)))))
+             (sort (getf (cdr event) :notes) #'< :key #'(lambda (l) (if (atom l) l (first l)))))
        (when (consp (car event))
-	 (setf (second (car event))
-	       (max
-		(second (car event))
-		(iter
-		  (for l in list)
-		  (maximizing (second (car l)))))))
+         (setf (second (car event))
+               (max
+                (second (car event))
+                (iter
+                  (for l in list)
+                  (maximizing (second (car l)))))))
        (when (and merge-marker (not event-tied))
-	 (pushnew merge-marker (getf (cdr event) :expressions)))
+         (pushnew merge-marker (getf (cdr event) :expressions)))
        event))))
 
 (defvar *simple-hierarchy* '(:score :part :voice :event))
@@ -175,35 +175,35 @@ This function does not support an atom number representing an event."
 
 (defun simple-type* (simple)
   (labels ((event-p (obj)
-	     (or (numberp obj)
-		 (and (consp obj)
-		      (numberp (first obj))
-		      (keywordp (second obj)))))
-	   (rec (simple h)
-	     (assert h nil "Does not seem to be a correct simple obj.")
-	     (if (event-p simple)
-		 (car h)
-		 (rec (first simple) (cdr h)))))
+             (or (numberp obj)
+                 (and (consp obj)
+                      (numberp (first obj))
+                      (keywordp (second obj)))))
+           (rec (simple h)
+             (assert h nil "Does not seem to be a correct simple obj.")
+             (if (event-p simple)
+                 (car h)
+                 (rec (first simple) (cdr h)))))
     (rec simple *simple-reverse-hierarchy*)))
 
 (defun simple-change-type* (new-type simple)
   (let* ((type (simple-type* simple))
-	 (type-diff (- (position new-type *simple-reverse-hierarchy*)
-		       (position type *simple-reverse-hierarchy*))))
+         (type-diff (- (position new-type *simple-reverse-hierarchy*)
+                       (position type *simple-reverse-hierarchy*))))
     (cond
       ((zerop type-diff)
        simple)
       ((plusp type-diff)
        (dotimes (i type-diff simple)
-	 (setq simple (list simple))))
+         (setq simple (list simple))))
       (t
        (dotimes (i (abs type-diff) simple)
-	 (setq simple (first simple)))))))
+         (setq simple (first simple)))))))
 
 (defmacro with-upgrade-to-score ((obj) &body body)
   (assert (symbolp obj))
   `(let* ((orig-type (simple-type* ,obj))
-	  (,obj (simple-change-type* :score ,obj)))
+          (,obj (simple-change-type* :score ,obj)))
      (simple-change-type* orig-type (progn ,@body))))
 
 (defun simple-without-starting-rest (simple)
@@ -218,39 +218,39 @@ This function does not support an atom number representing an event."
 
 (defun simple-select* (simple from &optional to)
   (labels ((starting-at (voice from)
-	     (if (<= from (event-start (first voice)))
-		 voice
-		 (starting-at (cdr voice) from))))
+             (if (<= from (event-start (first voice)))
+                 voice
+                 (starting-at (cdr voice) from))))
     (with-upgrade-to-score (simple)
       (iter
-	(for part in simple)
-	(for (values voices options) = (extract-options part))
-	(collect
-	 (nconc
-	  (iter
-	    (for voice in voices)
-	    (unless to
-	      (setq to (event-start (car (last voice)))))
-	    (setq voice (starting-at voice from))
-	    (collect
-	     (iter
-	       (for event in voice)
-	       (for start = (event-start event))
-	       (for rest-p = (event-rest-p event))
-	       (if-first-time
-		(progn
-		  (when (or (not (zerop start))
-			    rest-p)
-		    (collect '(0 :rest t)))
-		  (when rest-p
-		    (next-iteration))))
-	       (cond
-		 ((< start to)
-		  (collect event))
-		 (t
-		  (collect to)
-		  (terminate))))))
-	  options))))))
+        (for part in simple)
+        (for (values voices options) = (extract-options part))
+        (collect
+         (nconc
+          (iter
+            (for voice in voices)
+            (unless to
+              (setq to (event-start (car (last voice)))))
+            (setq voice (starting-at voice from))
+            (collect
+             (iter
+               (for event in voice)
+               (for start = (event-start event))
+               (for rest-p = (event-rest-p event))
+               (if-first-time
+                (progn
+                  (when (or (not (zerop start))
+                            rest-p)
+                    (collect '(0 :rest t)))
+                  (when rest-p
+                    (next-iteration))))
+               (cond
+                 ((< start to)
+                  (collect event))
+                 (t
+                  (collect to)
+                  (terminate))))))
+          options))))))
 
 (defun simple-change-event (simple fn)
   (with-upgrade-to-score (simple)
@@ -258,37 +258,37 @@ This function does not support an atom number representing an event."
       (for part in simple)
       (collect
        (multiple-value-bind (voices options)
-	   (extract-options part)
-	 (iter
-	   (for voice in voices)
-	   (for new-voice =
-		(iter
-		  (for event-tail on voice)
-		  (for event = (car event-tail))
-		  (for new-event = (funcall fn event (null (cdr event-tail))))
-		  (when new-event (collect new-event))))
-	   (setq new-voice (sort new-voice #'< :key #'event-start))
-	   (unless (zerop (event-start (first new-voice)))
-	     (push '(0 :rest t) new-voice))
-	   (collect new-voice into new-voices)
-	   (finally (return (nconc new-voices options)))))))))
+           (extract-options part)
+         (iter
+           (for voice in voices)
+           (for new-voice =
+                (iter
+                  (for event-tail on voice)
+                  (for event = (car event-tail))
+                  (for new-event = (funcall fn event (null (cdr event-tail))))
+                  (when new-event (collect new-event))))
+           (setq new-voice (sort new-voice #'< :key #'event-start))
+           (unless (zerop (event-start (first new-voice)))
+             (push '(0 :rest t) new-voice))
+           (collect new-voice into new-voices)
+           (finally (return (nconc new-voices options)))))))))
 
 (defun simple-change-start (simple fn)
   (simple-change-event
    simple
    #'(lambda (event end-p)
        (let* ((rest-p (event-rest-p event))
-	      (new-start (funcall fn (event-start event) rest-p)))
-	 (when (<= 0 new-start)
-	   (cond
-	     (rest-p
-	      (if (zerop new-start)
-		  '(0 :rest t)
-		  (* -1 new-start)))
-	     ((atom event)
-	      new-start)
-	     (t
-	      (cons new-start (cdr event)))))))))
+              (new-start (funcall fn (event-start event) rest-p)))
+         (when (<= 0 new-start)
+           (cond
+             (rest-p
+              (if (zerop new-start)
+                  '(0 :rest t)
+                  (* -1 new-start)))
+             ((atom event)
+              new-start)
+             (t
+              (cons new-start (cdr event)))))))))
 
 (defun simple-length (simple &optional ignore-last-rest)
   (iter
@@ -301,9 +301,9 @@ This function does not support an atom number representing an event."
       (for before-last = (car before-last-tail))
       (for last = (second before-last-tail))
       (in top (maximizing (event-start (if (and ignore-last-rest
-						(event-rest-p before-last))
-					   before-last
-					   last)))))))
+                                                (event-rest-p before-last))
+                                           before-last
+                                           last)))))))
 
 (defun simple-shift* (simple delta)
   (simple-change-start simple #'(lambda (start rest-p) (+ start delta))))
@@ -316,169 +316,169 @@ This function does not support an atom number representing an event."
    simple
    #'(lambda (event end-p)
        (flet ((transpose-note (note)
-		(if (atom note)
-		    (+ note transp)
-		    (singleton2atom
-		     (list* (+ (car note) transp)
-			    (let ((plist (copy-tree (cdr note))))
-			      (remf plist :enharmonic)
-			      plist))))))
-	 (if (or end-p (event-rest-p event))
-	     event
-	     (let ((event (copy-tree
-			   (if (atom event)
-			       `(,event :notes (60))
-			       event))))
-	       (setf (getf (cdr event) :notes)
-		     (mapcar #'transpose-note (getf (cdr event) :notes)))
-	       event))))))
+                (if (atom note)
+                    (+ note transp)
+                    (singleton2atom
+                     (list* (+ (car note) transp)
+                            (let ((plist (copy-tree (cdr note))))
+                              (remf plist :enharmonic)
+                              plist))))))
+         (if (or end-p (event-rest-p event))
+             event
+             (let ((event (copy-tree
+                           (if (atom event)
+                               `(,event :notes (60))
+                               event))))
+               (setf (getf (cdr event) :notes)
+                     (mapcar #'transpose-note (getf (cdr event) :notes)))
+               event))))))
 
 (defun simple-enharmonic* (simple model-score)
   (labels ((spelling-alist (score)
-	     (let ((voice (simple-change-type*
-			   :voice (typecase score
-				    (ccl::enp-application-window (score2simple score))
-				    (t score)))))
-	       (apply #'append (mapcar (lambda (event) (mapcar #'list! (getf (cdr event) :notes)))
-				       (remove-if #'atom voice)))))
-	   (lookup-spelling (pitch spelling-alist)
-	     (getf (cdr (assoc (mod12 pitch) spelling-alist :key #'mod12)) :enharmonic)))
+             (let ((voice (simple-change-type*
+                           :voice (typecase score
+                                    (ccl::enp-application-window (score2simple score))
+                                    (t score)))))
+               (apply #'append (mapcar (lambda (event) (mapcar #'list! (getf (cdr event) :notes)))
+                                       (remove-if #'atom voice)))))
+           (lookup-spelling (pitch spelling-alist)
+             (getf (cdr (assoc (mod12 pitch) spelling-alist :key #'mod12)) :enharmonic)))
     (let ((spelling-alist (spelling-alist model-score)))
       (simple-change-event
        simple
        #'(lambda (event end-p)
-	   (if (or end-p (event-rest-p event))
-	       event
-	       (let ((event (copy-tree
-			     (if (atom event)
-				 `(,event :notes (60))
-				 event))))
-		 (setf (getf (cdr event) :notes)
-		       (loop for pitch in (getf (cdr event) :notes)
-			  for enharmonic = (lookup-spelling pitch spelling-alist)
-			  if enharmonic
-			  collect `(,pitch :enharmonic ,enharmonic)
-			  else collect `(,pitch)))
-		 event)))))))
+           (if (or end-p (event-rest-p event))
+               event
+               (let ((event (copy-tree
+                             (if (atom event)
+                                 `(,event :notes (60))
+                                 event))))
+                 (setf (getf (cdr event) :notes)
+                       (loop for pitch in (getf (cdr event) :notes)
+                          for enharmonic = (lookup-spelling pitch spelling-alist)
+                          if enharmonic
+                          collect `(,pitch :enharmonic ,enharmonic)
+                          else collect `(,pitch)))
+                 event)))))))
 
 (defun simple-append* (ignore-last-rest &rest simples)
   (let ((new (list :score)))
     (labels ((get-nth (n list type)
-	       (if-bind it (nth n (cdr list))
-		 it
-		 (if-bind it (nthcdr n list)
-		   (cadr (rplacd it (list (list type))))
-		   (error "The ~A before n ~S does not yet exist." type n))))
-	     (delete-tags (list)
-	       (if (and (consp list)
-			(keywordp (car list)))
-		   (map-into (cdr list) #'delete-tags (cdr list))
-		   list))
-	     (delete-second (list)
-	       (rplacd list (nthcdr 2 list)))
-	     (nconc-nbutlast (a b)
-	       "(nconc (nbutlast a) b)"
-	       (rplacd (last a 2) b)
-	       a))
+               (if-bind it (nth n (cdr list))
+                 it
+                 (if-bind it (nthcdr n list)
+                   (cadr (rplacd it (list (list type))))
+                   (error "The ~A before n ~S does not yet exist." type n))))
+             (delete-tags (list)
+               (if (and (consp list)
+                        (keywordp (car list)))
+                   (map-into (cdr list) #'delete-tags (cdr list))
+                   list))
+             (delete-second (list)
+               (rplacd list (nthcdr 2 list)))
+             (nconc-nbutlast (a b)
+               "(nconc (nbutlast a) b)"
+               (rplacd (last a 2) b)
+               a))
       (iter
-	(with start = 0)
-	(for simple in simples)
-	(for shifted = (simple-shift* simple start))
-	(iter
-	  (for part in shifted)
-	  (for partind upfrom 0)
-	  (for (values voices options) = (extract-options part))
-	  (for new-part = (get-nth partind new :part))
-	  (iter
-	    (for voice in voices)
-	    (for voiceind upfrom 0)
-	    (for new-voice = (get-nth voiceind new-part :voice))
-	    (if (cdr new-voice)
-		(setf (cdr new-voice) (nconc-nbutlast (cdr new-voice) (cdr voice)))
-		(setf (cdr new-voice) (nconc (cdr new-voice)
-					     (if (and (event-rest-p (first voice))
-						      (event-rest-p (second voice)))
-						 (delete-second voice)
-						 voice))))))
-	(incf start (simple-length simple ignore-last-rest))
-	(finally (return (delete-tags new)))))))
+        (with start = 0)
+        (for simple in simples)
+        (for shifted = (simple-shift* simple start))
+        (iter
+          (for part in shifted)
+          (for partind upfrom 0)
+          (for (values voices options) = (extract-options part))
+          (for new-part = (get-nth partind new :part))
+          (iter
+            (for voice in voices)
+            (for voiceind upfrom 0)
+            (for new-voice = (get-nth voiceind new-part :voice))
+            (if (cdr new-voice)
+                (setf (cdr new-voice) (nconc-nbutlast (cdr new-voice) (cdr voice)))
+                (setf (cdr new-voice) (nconc (cdr new-voice)
+                                             (if (and (event-rest-p (first voice))
+                                                      (event-rest-p (second voice)))
+                                                 (delete-second voice)
+                                                 voice))))))
+        (incf start (simple-length simple ignore-last-rest))
+        (finally (return (delete-tags new)))))))
 
 (defun simple-merge* (simple1 simple2 &optional strict-durations)
   (let ((simple1 (simple-change-type* :voice simple1))
-	(simple2 (simple-change-type* :voice simple2))
-	res)
+        (simple2 (simple-change-type* :voice simple2))
+        res)
     (labels ((add (obj)
-	       (push obj res))
-	     (swap-last (last)
-	       (case last
-		 (first 'second)
-		 (second 'first)
-		 (otherwise last)))
-	     (rec (s1 s2
-		      ;; can be rest, first, second, equal, or nil....
-		      ;; for a pause, note from first, note from second, or merged from both, or unknown
-		      last
-		      )
-	       (cond
-		 ((and (null s1) (null s2))) ; noop
-		 ((null s1)
-		  (unless (and (or (event-rest-p (car s2))
-				   (null (cdr s2)))
-			       (eql last 'rest))
-		    (add (car s2)))
-		  (dolist (e (cdr s2))
-		    (add e)))
-		 ((null s2)
-		  (rec s2 s1 (swap-last last)))
-		 (t
-		  (let* ((s1-elt (car s1))
-			 (s2-elt (car s2))
-			 (s1-start (event-start s1-elt))
-			 (s2-start (event-start s2-elt))
-			 (s1-rest-p (if (null (cdr s1))
-					(progn
-					  (setq s1-elt (* -1 (event-start s1-elt)))
-					  t)
-					(event-rest-p s1-elt)))
-			 (s2-rest-p (if (null (cdr s2))
-					(progn
-					  (setq s2-elt (* -1 (event-start s2-elt)))
-					  t)
-					(event-rest-p s2-elt))))
-		    (cond
-		      ((= s1-start s2-start)
-		       (cond
-			 ((and s1-rest-p s2-rest-p)
-			  (unless (eql last 'rest)
-			    (add s1-elt))
-			  (rec (cdr s1) (cdr s2) 'rest))
-			 (s1-rest-p
-			  (add s2-elt)
-			  (rec (cdr s1) (cdr s2) 'second))
-			 (s2-rest-p
-			  (rec s2 s1 (swap-last last)))
-			 (t
-			  (let ((one s1-elt)
-				(two s2-elt))
-			    (when (atom one)
-			      (setq one `(,one :notes (60))))
-			    (when (atom two)
-			      (setq two `(,two :notes (60))))
-			    (add (merge-events (copy-tree one) (list (copy-tree two)) nil))
-			    (rec (cdr s1) (cdr s2) 'equal)))))
-		      ((< s1-start s2-start)
-		       (cond
-			 ((not s1-rest-p)
-			  (add s1-elt)
-			  (rec (cdr s1) s2 'first))
-			 ((or (eql last 'first)
-			      (and strict-durations (eql last 'equal)))
-			  (add s1-elt)
-			  (rec (cdr s1) s2 'rest))
-			 (t
-			  (rec (cdr s1) s2 last))))
-		      (t (rec s2 s1 (swap-last last)))
-		      ))))))
+               (push obj res))
+             (swap-last (last)
+               (case last
+                 (first 'second)
+                 (second 'first)
+                 (otherwise last)))
+             (rec (s1 s2
+                      ;; can be rest, first, second, equal, or nil....
+                      ;; for a pause, note from first, note from second, or merged from both, or unknown
+                      last
+                      )
+               (cond
+                 ((and (null s1) (null s2))) ; noop
+                 ((null s1)
+                  (unless (and (or (event-rest-p (car s2))
+                                   (null (cdr s2)))
+                               (eql last 'rest))
+                    (add (car s2)))
+                  (dolist (e (cdr s2))
+                    (add e)))
+                 ((null s2)
+                  (rec s2 s1 (swap-last last)))
+                 (t
+                  (let* ((s1-elt (car s1))
+                         (s2-elt (car s2))
+                         (s1-start (event-start s1-elt))
+                         (s2-start (event-start s2-elt))
+                         (s1-rest-p (if (null (cdr s1))
+                                        (progn
+                                          (setq s1-elt (* -1 (event-start s1-elt)))
+                                          t)
+                                        (event-rest-p s1-elt)))
+                         (s2-rest-p (if (null (cdr s2))
+                                        (progn
+                                          (setq s2-elt (* -1 (event-start s2-elt)))
+                                          t)
+                                        (event-rest-p s2-elt))))
+                    (cond
+                      ((= s1-start s2-start)
+                       (cond
+                         ((and s1-rest-p s2-rest-p)
+                          (unless (eql last 'rest)
+                            (add s1-elt))
+                          (rec (cdr s1) (cdr s2) 'rest))
+                         (s1-rest-p
+                          (add s2-elt)
+                          (rec (cdr s1) (cdr s2) 'second))
+                         (s2-rest-p
+                          (rec s2 s1 (swap-last last)))
+                         (t
+                          (let ((one s1-elt)
+                                (two s2-elt))
+                            (when (atom one)
+                              (setq one `(,one :notes (60))))
+                            (when (atom two)
+                              (setq two `(,two :notes (60))))
+                            (add (merge-events (copy-tree one) (list (copy-tree two)) nil))
+                            (rec (cdr s1) (cdr s2) 'equal)))))
+                      ((< s1-start s2-start)
+                       (cond
+                         ((not s1-rest-p)
+                          (add s1-elt)
+                          (rec (cdr s1) s2 'first))
+                         ((or (eql last 'first)
+                              (and strict-durations (eql last 'equal)))
+                          (add s1-elt)
+                          (rec (cdr s1) s2 'rest))
+                         (t
+                          (rec (cdr s1) s2 last))))
+                      (t (rec s2 s1 (swap-last last)))
+                      ))))))
       (rec simple1 simple2 nil)
       (setf (car res) (abs (car res)))	; dont need a minus at the end
       (nreverse res))))
@@ -495,8 +495,8 @@ This function does not support an atom number representing an event."
     (for d = (funcall d-gen))
     (for rest-p = (minusp d))
     (if rest-p
-	(collect (if (zerop time) '(0 :rest t) (* -1 time)))
-	(collect (copy-list `(,time :notes ,(list! (funcall p-gen))))))
+        (collect (if (zerop time) '(0 :rest t) (* -1 time)))
+        (collect (copy-list `(,time :notes ,(list! (funcall p-gen))))))
     (incf time (abs d))
     (when (= i num-events)
       (collect time))))
@@ -510,8 +510,8 @@ This function does not support an atom number representing an event."
     (for offset = (- (event-start nevent) (event-start event)))
     (unless rest-p
       (collect (if (atom event)
-		   (copy-list '(60))
-		   (getf (cdr event) :notes))
-	       into pitches))
+                   (copy-list '(60))
+                   (getf (cdr event) :notes))
+               into pitches))
     (collect (if rest-p (* -1 offset) offset) into durs)
     (finally (return (values pitches durs)))))
