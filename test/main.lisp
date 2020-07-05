@@ -213,7 +213,7 @@
   )
 
 (deftest simple2score-no-rests-floats-small.gq
-  #+sbcl(skip*)
+  #-pwgl(skip*)
   (for-all ((durs (gen-list :length (gen-integer :min 10 :max 20)
                             :elements #'(lambda () (random-float 0.1 6.0)))))
     (finishes (pw::gquantify durs))))
