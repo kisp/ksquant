@@ -45,4 +45,5 @@
 (defpackage :system
   (:use :cl))
 
-#+clisp (handler-bind ((system::simple-package-error #'continue)) (read-from-string "system::start-time"))
+#+clisp (handler-bind ((system::simple-package-error #'continue)) (read-from-string "SYSTEM::START-TIME"))
+#+clisp (handler-bind ((system::simple-package-error #'continue)) (read-from-string "SYSTEM::ENP-SCORE-NOTATION"))
