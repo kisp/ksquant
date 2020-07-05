@@ -44,3 +44,5 @@
 #+(or sbcl ccl)
 (defpackage :system
   (:use :cl))
+
+#+clisp (handler-bind ((system::simple-package-error #'continue)) (read-from-string "system::start-time"))
