@@ -37,10 +37,10 @@
 (defpackage :ccl
   (:use :cl))
 
-#+sbcl
+#+(or sbcl ccl)
 (defpackage :pw
   (:use :cl))
 
-#+sbcl
+#+(or sbcl ccl)
 (defpackage :system
   (:use :cl))
