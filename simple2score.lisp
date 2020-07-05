@@ -322,7 +322,7 @@ The space left in the current container is ~s (in floats ~s)."
           (let ((beat (min 1/4 ts)))
             (cons beat (time-signature2beats (- ts beat)))))))
 
-
+#+pwgl
 (defun simple-voice-gq (simple)
   (let* ((voices (pw::gquantify
                   (list
