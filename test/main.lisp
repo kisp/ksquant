@@ -72,6 +72,7 @@
            (part (simple-change-type :part shifted)))
       (multiple-value-bind (events options)
           (extract-options part)
+        (declare (ignore events))
         (is (eql :contrabass (getf options :instrument)))))))
 
 (deftest simple-length.1
