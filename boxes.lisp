@@ -63,7 +63,7 @@
                                                   :forbidden-patts forbidden-patts
                                                   :merge-marker merge-marker)))
                      options)))))
-    (values #-sbcl(ccl::adjoin-ties (ccl::make-score enp)) #+sbcl nil
+    (values #+pwgl(ccl::adjoin-ties (ccl::make-score enp)) #-pwgl nil
             enp)))
 
 (define-box simple2nm-score ((simple (0 1 2 3)))
