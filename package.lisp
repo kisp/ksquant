@@ -33,11 +33,11 @@
 (defpackage :ksquant
   (:use :cl :iterate :ompw))
 
-#+sbcl
+#+(or sbcl clisp)
 (defpackage :ccl
   (:use :cl))
 
-#+(or sbcl ccl)
+#+(or sbcl ccl clisp)
 (defpackage :pw
   (:use :cl))
 
