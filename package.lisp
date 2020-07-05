@@ -47,3 +47,4 @@
 
 #+clisp (handler-bind ((system::simple-package-error #'continue)) (read-from-string "SYSTEM::START-TIME"))
 #+clisp (handler-bind ((system::simple-package-error #'continue)) (read-from-string "SYSTEM::ENP-SCORE-NOTATION"))
+#+clisp (handler-bind ((system::simple-package-error #'continue)) (read-from-string "SYSTEM::DURATION"))
